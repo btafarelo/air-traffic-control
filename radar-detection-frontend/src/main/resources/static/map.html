@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Tracking Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+        }
+
+        .main-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 2px solid #00ff00;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        .map-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #00ff00;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 1px solid #00ff00;
+            z-index: 1000;
+        }
+
+        .connection-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #00ff00;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 5px 10px;
+            border: 1px solid #00ff00;
+            z-index: 1000;
+        }
+
+        .aircraft-list {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: #00ff00;
+            font-size: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 1px solid #00ff00;
+            max-height: 200px;
+            overflow-y: auto;
+            min-width: 200px;
+            z-index: 1000;
+        }
+
+        .control-panel {
+            width: 350px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            border-left: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            margin-bottom: 20px;
+            border: 1px solid #00ff00;
+            padding: 10px;
+        }
+
+        .panel-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00ff00;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 5px;
+        }
+
+        .flight-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            margin: 2px 0;
+            border: 1px solid #004400;
+            background: rgba(0, 20, 0, 0.3);
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .flight-item:hover {
+            background: rgba(0, 40, 0, 0.5);
+            border-color: #00ff00;
+        }
+
+        .flight-item.subscribed {
+            background: rgba(0, 60, 0, 0.7);
+            border-color: #00ff00;
+        }
+
+        .flight-item.selected {
+            background: rgba(0, 100, 0, 0.9);
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .subscribe-btn {
+            background: transparent;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 2px 6px;
+            font-size: 9px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+
+        .subscribe-btn:hover {
+            background: rgba(0, 255, 0, 0.2);
+        }
+
+        .subscribe-btn.subscribed {
+            background: rgba(0, 255, 0, 0.3);
+            color: #000;
+        }
+
+        .flight-details {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff00;
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+
+        .flight-details.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 2px 0;
+            border-bottom: 1px dotted #004400;
+        }
+
+        .detail-label {
+            color: #888;
+        }
+
+        .detail-value {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 255, 0, 0.2);
+        }
+
+        .control-btn.active {
+            background: rgba(0, 255, 0, 0.3);
+            color: #000;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-connected {
+            background: #00ff00;
+            box-shadow: 0 0 5px #00ff00;
+        }
+
+        .status-disconnected {
+            background: #ff0000;
+            box-shadow: 0 0 5px #ff0000;
+        }
+
+        .debug-panel {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            font-size: 10px;
+            max-width: 300px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .subscription-controls {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Custom Leaflet styles for dark theme */
+        .leaflet-container {
+            background: #000 !important;
+        }
+
+        .leaflet-tile {
+            filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(1.2);
+        }
+
+        .leaflet-control-zoom a {
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            color: #00ff00 !important;
+            border: 1px solid #00ff00 !important;
+        }
+
+        .leaflet-control-attribution {
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            color: #00ff00 !important;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background-color: rgba(0, 0, 0, 0.9) !important;
+            color: #00ff00 !important;
+            border: 1px solid #00ff00 !important;
+        }
+
+        .leaflet-popup-tip {
+            background-color: rgba(0, 0, 0, 0.9) !important;
+            border: 1px solid #00ff00 !important;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            z-index: 1000;
+        }
+
+        .map-control-btn {
+            display: block;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 5px 10px;
+            margin: 2px 0;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+        }
+
+        .map-control-btn:hover {
+            background: rgba(0, 255, 0, 0.2);
+        }
+
+        .map-control-btn.active {
+            background: rgba(0, 255, 0, 0.3);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="map-container">
+        <div id="map"></div>
+        <div class="map-info">
+            <div>FLIGHT TRACKING MAP</div>
+            <div>CENTER: GENEVA</div>
+            <div>LAT: 46.2044°N</div>
+            <div>LON: 6.1432°E</div>
+            <div>RANGE: 100KM</div>
+        </div>
+        <div class="connection-status" id="connectionStatus">
+            <span class="status-indicator status-disconnected"></span>
+            DISCONNECTED
+        </div>
+        <div class="aircraft-list" id="aircraftList">
+            <div style="font-weight: bold; margin-bottom: 5px;">TRACKED AIRCRAFT</div>
+            <div id="aircraftCount">0 CONTACTS</div>
+        </div>
+        <div class="debug-panel" id="debugPanel">
+            <div style="font-weight: bold; margin-bottom: 5px;">DEBUG LOG</div>
+            <div id="debugLog"></div>
+        </div>
+        <div class="map-controls">
+            <button class="map-control-btn" id="toggleRadarRange" onclick="toggleRadarRange()">RADAR RANGE</button>
+            <button class="map-control-btn" id="toggleAirports" onclick="toggleAirports()">AIRPORTS</button>
+            <button class="map-control-btn" id="toggleCities" onclick="toggleCities()">CITIES</button>
+            <button class="map-control-btn" id="toggleTrails" onclick="toggleTrails()">FLIGHT TRAILS</button>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="panel-section">
+            <div class="panel-title">CONNECTION STATUS</div>
+            <div id="connectionDetails" style="font-size: 10px; color: #888;">
+                Attempting to connect...
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <div class="panel-title">FLIGHT DETAILS</div>
+            <div class="flight-details empty" id="flightDetails">
+                Click on a flight to view details
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <div class="panel-title">SUBSCRIPTION CONTROLS</div>
+            <div class="subscription-controls">
+                <button class="control-btn" id="subscribeAllBtn" onclick="subscribeToAll()">SUBSCRIBE ALL</button>
+                <button class="control-btn" id="unsubscribeAllBtn" onclick="unsubscribeFromAll()">UNSUBSCRIBE ALL</button>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <div class="panel-title">ACTIVE FLIGHTS</div>
+            <div id="flightsList">
+                <div style="color: #666; font-style: italic; text-align: center; padding: 20px;">
+                    No flights detected
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Constants
+    const GENEVA_LAT = 46.2044;
+    const GENEVA_LON = 6.1432;
+    const MAX_RANGE_KM = 100;
+
+    // Map setup
+    let map;
+    let radarRangeCircle;
+    let aircraftMarkers = new Map();
+    let flightTrails = new Map();
+    let landmarkMarkers = new Map();
+
+    // State management
+    let aircraft = new Map();
+    let subscribedFlights = new Set();
+    let selectedFlight = null;
+    let ws = null;
+    let isSubscribedToAll = false;
+    let connectionAttempts = 0;
+    let maxConnectionAttempts = 3;
+
+    // Display toggles
+    let showRadarRange = true;
+    let showAirports = true;
+    let showCities = true;
+    let showTrails = false;
+
+    // DOM elements
+    const connectionStatus = document.getElementById('connectionStatus');
+    const connectionDetails = document.getElementById('connectionDetails');
+    const aircraftList = document.getElementById('aircraftList');
+    const aircraftCount = document.getElementById('aircraftCount');
+    const flightDetails = document.getElementById('flightDetails');
+    const flightsList = document.getElementById('flightsList');
+    const subscribeAllBtn = document.getElementById('subscribeAllBtn');
+    const unsubscribeAllBtn = document.getElementById('unsubscribeAllBtn');
+    const debugLog = document.getElementById('debugLog');
+
+    // Initialize map
+    function initMap() {
+        map = L.map('map', {
+            center: [GENEVA_LAT, GENEVA_LON],
+            zoom: 9,
+            zoomControl: true,
+            attributionControl: true
+        });
+
+        // Use local OpenStreetMap tiles
+        L.tileLayer('http://localhost:8081/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        // Add radar range circle
+        radarRangeCircle = L.circle([GENEVA_LAT, GENEVA_LON], {
+            radius: MAX_RANGE_KM * 1000, // Convert to meters
+            color: '#00ff00',
+            fillColor: 'transparent',
+            weight: 2,
+            opacity: 0.8,
+            dashArray: '5, 5'
+        }).addTo(map);
+
+        // Add landmarks
+        addLandmarks();
+
+        addDebugLog('Map initialized with OpenStreetMap tiles');
+    }
+
+    // Add landmarks to map
+    function addLandmarks() {
+        const landmarks = [
+            { name: 'Geneva Airport', lat: 46.2044, lon: 6.1432, type: 'airport', icon: '✈️' },
+            { name: 'Zurich Airport', lat: 47.4647, lon: 8.5492, type: 'airport', icon: '✈️' },
+            { name: 'Lyon Airport', lat: 45.7256, lon: 5.0811, type: 'airport', icon: '✈️' },
+            { name: 'Lausanne', lat: 46.5197, lon: 6.6323, type: 'city', icon: '🏙️' },
+            { name: 'Bern', lat: 46.9481, lon: 7.4474, type: 'city', icon: '🏙️' },
+            { name: 'Chamonix', lat: 45.9237, lon: 6.8694, type: 'city', icon: '🏔️' },
+            { name: 'Annecy', lat: 45.8992, lon: 6.1294, type: 'city', icon: '🏙️' },
+            { name: 'Lyon', lat: 45.7640, lon: 4.8357, type: 'city', icon: '🏙️' },
+            { name: 'Lake Geneva', lat: 46.4, lon: 6.5, type: 'lake', icon: '🌊' }
+        ];
+
+        landmarks.forEach(landmark => {
+            const distance = calculateDistance(GENEVA_LAT, GENEVA_LON, landmark.lat, landmark.lon);
+            if (distance <= MAX_RANGE_KM) {
+                const marker = L.marker([landmark.lat, landmark.lon], {
+                    icon: L.divIcon({
+                        html: `<div style="background: rgba(0,0,0,0.8); color: #00ff00; padding: 2px 4px; border: 1px solid #00ff00; font-size: 10px; white-space: nowrap;">${landmark.icon} ${landmark.name}</div>`,
+                        className: 'landmark-marker',
+                        iconSize: [null, null],
+                        iconAnchor: [0, 0]
+                    })
+                });
+
+                landmarkMarkers.set(landmark.name, { marker, type: landmark.type });
+
+                if ((landmark.type === 'airport' && showAirports) ||
+                    (landmark.type === 'city' && showCities) ||
+                    landmark.type === 'lake') {
+                    marker.addTo(map);
+                }
+            }
+        });
+    }
+
+    // Toggle functions
+    function toggleRadarRange() {
+        showRadarRange = !showRadarRange;
+        const btn = document.getElementById('toggleRadarRange');
+
+        if (showRadarRange) {
+            radarRangeCircle.addTo(map);
+            btn.classList.add('active');
+        } else {
+            map.removeLayer(radarRangeCircle);
+            btn.classList.remove('active');
+        }
+
+        addDebugLog(`Radar range: ${showRadarRange ? 'ON' : 'OFF'}`);
+    }
+
+    function toggleAirports() {
+        showAirports = !showAirports;
+        const btn = document.getElementById('toggleAirports');
+
+        landmarkMarkers.forEach((landmark, name) => {
+            if (landmark.type === 'airport') {
+                if (showAirports) {
+                    landmark.marker.addTo(map);
+                } else {
+                    map.removeLayer(landmark.marker);
+                }
+            }
+        });
+
+        btn.classList.toggle('active', showAirports);
+        addDebugLog(`Airports: ${showAirports ? 'ON' : 'OFF'}`);
+    }
+
+    function toggleCities() {
+        showCities = !showCities;
+        const btn = document.getElementById('toggleCities');
+
+        landmarkMarkers.forEach((landmark, name) => {
+            if (landmark.type === 'city') {
+                if (showCities) {
+                    landmark.marker.addTo(map);
+                } else {
+                    map.removeLayer(landmark.marker);
+                }
+            }
+        });
+
+        btn.classList.toggle('active', showCities);
+        addDebugLog(`Cities: ${showCities ? 'ON' : 'OFF'}`);
+    }
+
+    function toggleTrails() {
+        showTrails = !showTrails;
+        const btn = document.getElementById('toggleTrails');
+
+        if (!showTrails) {
+            // Clear all trails
+            flightTrails.forEach((trail, callsign) => {
+                map.removeLayer(trail);
+            });
+            flightTrails.clear();
+        }
+
+        btn.classList.toggle('active', showTrails);
+        addDebugLog(`Flight trails: ${showTrails ? 'ON' : 'OFF'}`);
+    }
+
+    // Utility functions
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    function calculateBearing(lat1, lon1, lat2, lon2) {
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+        const lat1Rad = lat1 * (Math.PI / 180);
+        const lat2Rad = lat2 * (Math.PI / 180);
+        const y = Math.sin(dLon) * Math.cos(lat2Rad);
+        const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+                Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+        let bearing = Math.atan2(y, x);
+        return (bearing * 180 / Math.PI + 360) % 360;
+    }
+
+    // Debug logging
+    function addDebugLog(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `[${timestamp}] ${message}`;
+        console.log(logEntry);
+
+        const logDiv = document.createElement('div');
+        logDiv.textContent = logEntry;
+        logDiv.style.marginBottom = '2px';
+        debugLog.appendChild(logDiv);
+
+        while (debugLog.children.length > 10) {
+            debugLog.removeChild(debugLog.firstChild);
+        }
+
+        debugLog.scrollTop = debugLog.scrollHeight;
+    }
+
+    // Aircraft management
+    function updateAircraftOnMap() {
+        aircraft.forEach((data, callsign) => {
+            const distance = calculateDistance(GENEVA_LAT, GENEVA_LON, data.latitude, data.longitude);
+
+            if (distance <= MAX_RANGE_KM) {
+                let marker = aircraftMarkers.get(callsign);
+
+                if (!marker) {
+                    // Create new aircraft marker
+                    const isSelected = selectedFlight === callsign;
+                    const isSubscribed = subscribedFlights.has(callsign) || isSubscribedToAll;
+
+                    let color = '#00ff00';
+                    if (isSelected) color = '#ffff00';
+                    else if (isSubscribed) color = '#00ff88';
+
+                    marker = L.marker([data.latitude, data.longitude], {
+                        icon: L.divIcon({
+                            html: `<div style="background: ${color}; width: 8px; height: 8px; border-radius: 50%; border: 1px solid ${color};"></div>`,
+                            className: 'aircraft-marker',
+                            iconSize: [8, 8],
+                            iconAnchor: [4, 4]
+                        })
+                    });
+
+                    marker.bindPopup(`
+                        <div style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 11px;">
+                            <strong>${callsign}</strong><br>
+                            ${data.aircraftType || 'N/A'}<br>
+                            ${data.origin || 'N/A'} → ${data.destination || 'N/A'}<br>
+                            Alt: ${data.altitude ? Math.round(data.altitude) + 'ft' : 'N/A'}<br>
+                            Speed: ${data.speed ? Math.round(data.speed) + 'kt' : 'N/A'}<br>
+                            Distance: ${distance.toFixed(1)}km
+                        </div>
+                    `);
+
+                    marker.on('click', () => selectFlight(callsign));
+                    marker.addTo(map);
+                    aircraftMarkers.set(callsign, marker);
+
+                    addDebugLog(`Added aircraft marker: ${callsign}`);
+                } else {
+                    // Update existing marker position
+                    marker.setLatLng([data.latitude, data.longitude]);
+
+                    // Update marker color based on selection/subscription
+                    const isSelected = selectedFlight === callsign;
+                    const isSubscribed = subscribedFlights.has(callsign) || isSubscribedToAll;
+
+                    let color = '#00ff00';
+                    if (isSelected) color = '#ffff00';
+                    else if (isSubscribed) color = '#00ff88';
+
+                    marker.setIcon(L.divIcon({
+                        html: `<div style="background: ${color}; width: 8px; height: 8px; border-radius: 50%; border: 1px solid ${color};"></div>`,
+                        className: 'aircraft-marker',
+                        iconSize: [8, 8],
+                        iconAnchor: [4, 4]
+                    }));
+
+                    // Update flight trail
+                    if (showTrails) {
+                        let trail = flightTrails.get(callsign);
+                        if (!trail) {
+                            trail = L.polyline([], { color: color, weight: 2, opacity: 0.6 });
+                            trail.addTo(map);
+                            flightTrails.set(callsign, trail);
+                        }
+
+                        const latlngs = trail.getLatLngs();
+                        latlngs.push([data.latitude, data.longitude]);
+
+                        // Keep only last 20 positions
+                        if (latlngs.length > 20) {
+                            latlngs.shift();
+                        }
+
+                        trail.setLatLngs(latlngs);
+                    }
+                }
+            } else {
+                // Remove aircraft that are out of range
+                const marker = aircraftMarkers.get(callsign);
+                if (marker) {
+                    map.removeLayer(marker);
+                    aircraftMarkers.delete(callsign);
+                }
+
+                const trail = flightTrails.get(callsign);
+                if (trail) {
+                    map.removeLayer(trail);
+                    flightTrails.delete(callsign);
+                }
+
+                aircraft.delete(callsign);
+            }
+        });
+
+        // Clean up markers for aircraft no longer in data
+        aircraftMarkers.forEach((marker, callsign) => {
+            if (!aircraft.has(callsign)) {
+                map.removeLayer(marker);
+                aircraftMarkers.delete(callsign);
+
+                const trail = flightTrails.get(callsign);
+                if (trail) {
+                    map.removeLayer(trail);
+                    flightTrails.delete(callsign);
+                }
+            }
+        });
+    }
+
+    // UI Update functions (same as radar.html)
+    function updateAircraftList() {
+        const count = aircraft.size;
+        aircraftCount.textContent = `${count} CONTACTS`;
+
+        let listHTML = '<div style="font-weight: bold; margin-bottom: 5px;">TRACKED AIRCRAFT</div>';
+        aircraft.forEach((data, callsign) => {
+            const distance = calculateDistance(GENEVA_LAT, GENEVA_LON, data.latitude, data.longitude);
+            const bearing = calculateBearing(GENEVA_LAT, GENEVA_LON, data.latitude, data.longitude);
+            listHTML += `<div style="margin-bottom: 2px;">
+                <span style="color: ${selectedFlight === callsign ? '#ffff00' : '#00ff00'};">${callsign}</span><br>
+                <span style="font-size: 8px;">
+                    ${distance.toFixed(1)}km ${bearing.toFixed(0)}°<br>
+                    ${data.altitude ? `FL${Math.round(data.altitude / 100)}` : 'N/A'}
+                    ${data.speed ? ` ${Math.round(data.speed)}kt` : ''}
+                </span>
+            </div>`;
+        });
+        aircraftList.innerHTML = listHTML;
+    }
+
+    function updateFlightsList() {
+        if (aircraft.size === 0) {
+            flightsList.innerHTML = '<div style="color: #666; font-style: italic; text-align: center; padding: 20px;">No flights detected</div>';
+            return;
+        }
+
+        let html = '';
+        aircraft.forEach((data, callsign) => {
+            const isSubscribed = subscribedFlights.has(callsign) || isSubscribedToAll;
+            const isSelected = selectedFlight === callsign;
+
+            html += `<div class="flight-item ${isSubscribed ? 'subscribed' : ''} ${isSelected ? 'selected' : ''}"
+                          onclick="selectFlight('${callsign}')">
+                <div>
+                    <div style="font-weight: bold;">${callsign}</div>
+                    <div style="font-size: 9px; color: #888;">
+                        ${data.origin || 'N/A'} → ${data.destination || 'N/A'}
+                    </div>
+                </div>
+                <button class="subscribe-btn ${isSubscribed ? 'subscribed' : ''}"
+                        onclick="event.stopPropagation(); toggleSubscription('${callsign}')">
+                    ${isSubscribed ? 'UNSUB' : 'SUB'}
+                </button>
+            </div>`;
+        });
+
+        flightsList.innerHTML = html;
+    }
+
+    function updateFlightDetails(callsign) {
+        if (!callsign || !aircraft.has(callsign)) {
+            flightDetails.className = 'flight-details empty';
+            flightDetails.innerHTML = 'Click on a flight to view details';
+            return;
+        }
+
+        const data = aircraft.get(callsign);
+        const distance = calculateDistance(GENEVA_LAT, GENEVA_LON, data.latitude, data.longitude);
+        const bearing = calculateBearing(GENEVA_LAT, GENEVA_LON, data.latitude, data.longitude);
+
+        flightDetails.className = 'flight-details';
+        flightDetails.innerHTML = `
+            <div style="font-weight: bold; margin-bottom: 10px; color: #ffff00;">${callsign}</div>
+            <div class="detail-row">
+                <span class="detail-label">Aircraft Type:</span>
+                <span class="detail-value">${data.aircraftType || 'N/A'}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Origin:</span>
+                <span class="detail-value">${data.origin || 'N/A'}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Destination:</span>
+                <span class="detail-value">${data.destination || 'N/A'}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Latitude:</span>
+                <span class="detail-value">${data.latitude.toFixed(4)}°</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Longitude:</span>
+                <span class="detail-value">${data.longitude.toFixed(4)}°</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Altitude:</span>
+                <span class="detail-value">${data.altitude ? `${Math.round(data.altitude)} ft (FL${Math.round(data.altitude / 100)})` : 'N/A'}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Speed:</span>
+                <span class="detail-value">${data.speed ? `${Math.round(data.speed)} knots` : 'N/A'}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Distance:</span>
+                <span class="detail-value">${distance.toFixed(2)} km</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Bearing:</span>
+                <span class="detail-value">${bearing.toFixed(1)}°</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Occupancy:</span>
+                <span class="detail-value">${data.occupancy || 'N/A'} passengers</span>
+            </div>
+        `;
+    }
+
+    function updateConnectionStatus(status, details) {
+        connectionDetails.textContent = details;
+
+        if (status === 'connected') {
+            connectionStatus.innerHTML = '<span class="status-indicator status-connected"></span>CONNECTED';
+        } else if (status === 'connecting') {
+            connectionStatus.innerHTML = '<span class="status-indicator status-disconnected"></span>CONNECTING...';
+        } else {
+            connectionStatus.innerHTML = '<span class="status-indicator status-disconnected"></span>DISCONNECTED';
+        }
+    }
+
+    // Event handlers
+    function selectFlight(callsign) {
+        selectedFlight = callsign;
+        updateFlightDetails(callsign);
+        updateFlightsList();
+        updateAircraftOnMap(); // Update marker colors
+
+        // Center map on selected flight
+        const data = aircraft.get(callsign);
+        if (data) {
+            map.setView([data.latitude, data.longitude], map.getZoom());
+        }
+
+        addDebugLog(`Selected flight: ${callsign}`);
+    }
+
+    function toggleSubscription(callsign) {
+        if (subscribedFlights.has(callsign)) {
+            subscribedFlights.delete(callsign);
+            sendWebSocketMessage({ action: 'unsubscribe', callsign: callsign });
+            addDebugLog(`Unsubscribed from: ${callsign}`);
+        } else {
+            subscribedFlights.add(callsign);
+            sendWebSocketMessage({ action: 'subscribe', callsign: callsign });
+            addDebugLog(`Subscribed to: ${callsign}`);
+        }
+        updateFlightsList();
+        updateAircraftOnMap(); // Update marker colors
+    }
+
+    function subscribeToAll() {
+        if (!isSubscribedToAll) {
+            isSubscribedToAll = true;
+            subscribedFlights.clear();
+            sendWebSocketMessage({ action: 'subscribe', callsign: 'ALL' });
+            subscribeAllBtn.classList.add('active');
+            unsubscribeAllBtn.classList.remove('active');
+            updateFlightsList();
+            updateAircraftOnMap(); // Update marker colors
+            addDebugLog('Subscribed to ALL flights');
+        }
+    }
+
+    function unsubscribeFromAll() {
+        if (isSubscribedToAll) {
+            isSubscribedToAll = false;
+            sendWebSocketMessage({ action: 'unsubscribe', callsign: 'ALL' });
+        }
+        subscribedFlights.clear();
+
+        // Clear all aircraft from map
+        aircraftMarkers.forEach((marker, callsign) => {
+            map.removeLayer(marker);
+        });
+        aircraftMarkers.clear();
+
+        flightTrails.forEach((trail, callsign) => {
+            map.removeLayer(trail);
+        });
+        flightTrails.clear();
+
+        aircraft.clear();
+        selectedFlight = null;
+        updateFlightDetails(null);
+
+        subscribeAllBtn.classList.remove('active');
+        unsubscribeAllBtn.classList.add('active');
+        updateFlightsList();
+        addDebugLog('Unsubscribed from ALL flights - map cleared');
+    }
+
+    // WebSocket functions (same as radar.html)
+    function sendWebSocketMessage(message) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify(message));
+            addDebugLog(`Sent: ${JSON.stringify(message)}`);
+        } else {
+            addDebugLog('Cannot send message - WebSocket not connected');
+        }
+    }
+
+    function connectWebSocket() {
+        const wsUrls = [
+            'ws://localhost:8080/ws',
+            'ws://localhost:8080/sockjs/ws/websocket'
+        ];
+
+        if (connectionAttempts >= maxConnectionAttempts) {
+            addDebugLog('Max connection attempts reached');
+            updateConnectionStatus('error', 'Max connection attempts reached');
+            return;
+        }
+
+        const wsUrl = wsUrls[connectionAttempts % wsUrls.length];
+        addDebugLog(`Attempting connection ${connectionAttempts + 1}/${maxConnectionAttempts} to: ${wsUrl}`);
+        updateConnectionStatus('connecting', `Trying: ${wsUrl}`);
+
+        try {
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                addDebugLog(`WebSocket connected to: ${wsUrl}`);
+                updateConnectionStatus('connected', `Connected to: ${wsUrl}`);
+                connectionAttempts = 0;
+
+                setTimeout(() => {
+                    subscribeToAll();
+                }, 1000);
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    const message = JSON.parse(event.data);
+
+                    if (message.type === 'flightUpdate') {
+                        const data = JSON.parse(message.data);
+                        handleFlightUpdate(data);
+                    } else if (message.type === 'currentFlights') {
+                        const flights = JSON.parse(message.data);
+                        flights.forEach(flight => handleFlightUpdate(flight));
+                        addDebugLog(`Loaded ${flights.length} current flights`);
+                    } else if (message.type === 'subscriptionConfirmed') {
+                        addDebugLog(`Subscription confirmed: ${message.callsign}`);
+                    } else if (message.type === 'error') {
+                        addDebugLog(`Server error: ${message.message}`);
+                    }
+                } catch (error) {
+                    addDebugLog(`Error parsing message: ${error.message}`);
+                }
+            };
+
+            ws.onclose = function(event) {
+                addDebugLog(`WebSocket closed: ${event.code} - ${event.reason}`);
+                updateConnectionStatus('disconnected', `Connection closed: ${event.code}`);
+
+                connectionAttempts++;
+                if (connectionAttempts < maxConnectionAttempts) {
+                    setTimeout(connectWebSocket, 3000);
+                }
+            };
+
+            ws.onerror = function(error) {
+                addDebugLog(`WebSocket error: ${error}`);
+                updateConnectionStatus('error', 'Connection error');
+
+                connectionAttempts++;
+                if (connectionAttempts < maxConnectionAttempts) {
+                    setTimeout(connectWebSocket, 3000);
+                }
+            };
+        } catch (error) {
+            addDebugLog(`Failed to create WebSocket: ${error.message}`);
+            connectionAttempts++;
+            if (connectionAttempts < maxConnectionAttempts) {
+                setTimeout(connectWebSocket, 3000);
+            }
+        }
+    }
+
+    function handleFlightUpdate(data) {
+        if (data.callsign && data.latitude && data.longitude) {
+            const distance = calculateDistance(GENEVA_LAT, GENEVA_LON, data.latitude, data.longitude);
+
+            if (distance <= MAX_RANGE_KM && data.inRadarRange) {
+                aircraft.set(data.callsign, {
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    altitude: data.altitude,
+                    speed: data.speed,
+                    aircraftType: data.aircraftType,
+                    origin: data.origin,
+                    destination: data.destination,
+                    occupancy: data.occupancy,
+                    inRadarRange: data.inRadarRange,
+                    distanceFromRadar: data.distanceFromRadar,
+                    timestamp: Date.now()
+                });
+            } else {
+                aircraft.delete(data.callsign);
+                if (selectedFlight === data.callsign) {
+                    selectedFlight = null;
+                    updateFlightDetails(null);
+                }
+            }
+        }
+    }
+
+    // Animation loop
+    function animate() {
+        updateAircraftOnMap();
+        updateAircraftList();
+        updateFlightsList();
+
+        // Clean up old aircraft data
+        const now = Date.now();
+        aircraft.forEach((data, callsign) => {
+            if (now - data.timestamp > 30000) {
+                aircraft.delete(callsign);
+                if (selectedFlight === callsign) {
+                    selectedFlight = null;
+                    updateFlightDetails(null);
+                }
+            }
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        addDebugLog('Flight tracking map initializing...');
+        initMap();
+        connectWebSocket();
+        animate();
+
+        // Set initial button states
+        document.getElementById('toggleRadarRange').classList.add('active');
+        document.getElementById('toggleAirports').classList.add('active');
+        document.getElementById('toggleCities').classList.add('active');
+    });
+
+    // Handle page visibility changes
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            if (ws) {
+                ws.close();
+                addDebugLog('Page hidden - closing WebSocket');
+            }
+        } else {
+            addDebugLog('Page visible - reconnecting WebSocket');
+            connectionAttempts = 0;
+            connectWebSocket();
+        }
+    });
+</script>
+</body>
+</html>

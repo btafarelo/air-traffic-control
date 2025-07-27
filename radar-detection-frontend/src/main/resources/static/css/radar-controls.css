@@ -1,0 +1,154 @@
+/* Radar control styles */
+.radar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.control-btn {
+  background: #000;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 6px 12px;
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 70px;
+}
+
+.control-btn:hover {
+  background: #002200;
+  box-shadow: 0 0 4px #00ff00;
+}
+
+.control-btn.active {
+  background: #004400;
+  color: #ffffff;
+  box-shadow: 0 0 6px #00ff00;
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.subscription-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.subscription-controls .control-btn {
+  flex: 1;
+}
+
+/* Toggle button animations */
+.control-btn.active::before {
+  content: "● ";
+  color: #00ff00;
+}
+
+.control-btn:not(.active)::before {
+  content: "○ ";
+  color: #666;
+}
+
+/* Button groups */
+.button-group {
+  display: flex;
+  border: 1px solid #00ff00;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.button-group .control-btn {
+  border: none;
+  border-right: 1px solid #00ff00;
+  border-radius: 0;
+}
+
+.button-group .control-btn:last-child {
+  border-right: none;
+}
+
+/* Status indicators */
+.status-indicator-text {
+  font-size: 8px;
+  color: #888;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.status-indicator-text.active {
+  color: #00ff00;
+}
+
+.status-indicator-text.error {
+  color: #ff4444;
+}
+
+.status-indicator-text.warning {
+  color: #ffaa00;
+}
+
+/* Control button styles */
+.toggle-group,
+.subscription-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.control-button {
+  background-color: #001122;
+  border: 1px solid #004400;
+  color: #888;
+  padding: 8px 12px;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 80px;
+}
+
+.control-button:hover {
+  background-color: #002200;
+  border-color: #00ff00;
+}
+
+.control-button.active {
+  background-color: #004400;
+  border-color: #00ff00;
+  color: #00ff00;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+.control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #004400;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00ff00;
+}

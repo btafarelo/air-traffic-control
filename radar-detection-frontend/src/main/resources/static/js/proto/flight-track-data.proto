@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+option java_package = "com.github.btafarelo.airtraffic.model";
+option java_multiple_files = true;
+
+message FlightTrackData {
+  required double latitude = 1;
+  required double longitude = 2;
+  required double altitude = 3;
+  required double speed = 4;
+  required string callsign = 5;
+  required string aircraftType = 6;
+  required int32 occupancy = 7;
+  required string origin = 8;
+  required string destination = 9;
+  required double distanceFromRadar = 10;
+  required bool inRadarRange = 11;
+  required int64 generationTimestamp = 12;
+}
+
+enum Command {
+  COMMAND_UNKNOWN = 0;
+  FLIGHT_UPDATE = 1;
+}
+
+message MessageWrapper {
+  required Command command = 1;
+  repeated FlightTrackData data = 2;
+}

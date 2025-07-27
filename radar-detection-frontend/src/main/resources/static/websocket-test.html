@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            padding: 20px;
+        }
+        .log {
+            background: rgba(0, 20, 0, 0.5);
+            border: 1px solid #00ff00;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        button {
+            background: transparent;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        button:hover {
+            background: rgba(0, 255, 0, 0.2);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #00ff00;
+        }
+    </style>
+</head>
+<body>
+<h1>WebSocket Connection Test</h1>
+
+<div class="status" id="status">
+    Status: Disconnected
+</div>
+
+<div>
+    <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+    <button onclick="subscribeAll()">Subscribe All</button>
+    <button onclick="testBroadcast()">Test Broadcast</button>
+    <button onclick="clearLog()">Clear Log</button>
+</div>
+
+<div class="log" id="log"></div>
+
+<script>
+    let ws = null;
+    const log = document.getElementById('log');
+    const status = document.getElementById('status');
+
+    function addLog(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `[${timestamp}] ${message}`;
+        console.log(logEntry);
+
+        const div = document.createElement('div');
+        div.textContent = logEntry;
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function updateStatus(text, connected = false) {
+        status.textContent = `Status: ${text}`;
+        status.style.borderColor = connected ? '#00ff00' : '#ff0000';
+    }
+
+    function connect() {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            addLog('Already connected');
+            return;
+        }
+
+        const wsUrl = 'ws://localhost:8080/ws';
+        addLog(`Connecting to ${wsUrl}...`);
+        updateStatus('Connecting...');
+
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = function() {
+            addLog('✅ WebSocket connected successfully');
+            updateStatus('Connected', true);
+        };
+
+        ws.onmessage = function(event) {
+            try {
+                const message = JSON.parse(event.data);
+                addLog(`📨 Received: ${message.type}`);
+
+                if (message.type === 'flightUpdate') {
+                    const flightData = typeof message.data === 'string' ?
+                        JSON.parse(message.data) : message.data;
+                    addLog(`✈️ Flight Update: ${flightData.callsign} at ${flightData.latitude.toFixed(4)}, ${flightData.longitude.toFixed(4)}`);
+                } else if (message.type === 'currentFlights') {
+                    const flights = typeof message.data === 'string' ?
+                        JSON.parse(message.data) : message.data;
+                    addLog(`📋 Current Flights: ${flights.length} flights`);
+                } else if (message.type === 'subscriptionConfirmed') {
+                    addLog(`✅ Subscription confirmed: ${message.callsign}`);
+                } else if (message.type === 'test') {
+                    addLog(`🧪 Test message: ${message.message}`);
+                } else {
+                    addLog(`📨 Message: ${JSON.stringify(message)}`);
+                }
+            } catch (error) {
+                addLog(`❌ Error parsing message: ${error.message}`);
+                addLog(`Raw message: ${event.data}`);
+            }
+        };
+
+        ws.onclose = function(event) {
+            addLog(`🔌 WebSocket closed: ${event.code} - ${event.reason}`);
+            updateStatus('Disconnected');
+        };
+
+        ws.onerror = function(error) {
+            addLog(`❌ WebSocket error: ${error}`);
+            updateStatus('Error');
+        };
+    }
+
+    function disconnect() {
+        if (ws) {
+            ws.close();
+            addLog('Disconnecting...');
+        }
+    }
+
+    function subscribeAll() {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            const message = { action: 'subscribe', callsign: 'ALL' };
+            ws.send(JSON.stringify(message));
+            addLog('📡 Sent subscription request for ALL flights');
+        } else {
+            addLog('❌ Not connected');
+        }
+    }
+
+    function testBroadcast() {
+        fetch('http://localhost:8080/api/flights/test-broadcast', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                addLog(`🧪 Test broadcast result: ${data.success ? 'SUCCESS' : 'FAILED'}`);
+                if (data.connectedClients !== undefined) {
+                    addLog(`👥 Connected clients: ${data.connectedClients}`);
+                }
+            })
+            .catch(error => {
+                addLog(`❌ Test broadcast failed: ${error.message}`);
+            });
+    }
+
+    function clearLog() {
+        log.innerHTML = '';
+    }
+
+    // Auto-connect on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        addLog('WebSocket test page loaded');
+        connect();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+spring:
+  rabbitmq:
+    stream:
+      host: localhost
+      port: 5672
+      username: guest
+      password: guest
+
+app:
+  FLIGHT_STAGGER_MIN_SECONDS: 3
+  FLIGHT_STAGGER_MAX_SECONDS: 8

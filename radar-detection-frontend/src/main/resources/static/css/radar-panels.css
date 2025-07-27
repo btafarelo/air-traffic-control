@@ -1,0 +1,252 @@
+/* Side panel styles - Made 30% larger */
+.left-panel,
+.right-panel {
+  width: 455px; /* Increased by 30% from 350px */
+  background: linear-gradient(180deg, #001100 0%, #000800 100%);
+  border: 1px solid #00ff00;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.left-panel {
+  border-right: none;
+}
+
+.right-panel {
+  border-left: none;
+}
+
+/* Panel and list styles */
+.panel-section {
+  background-color: #000a1a;
+  border: 1px solid #004400;
+  padding: 10px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-section:last-child {
+  border-bottom: none;
+}
+
+.panel-title {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #00ff00;
+  text-align: center;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #004400;
+  padding-bottom: 5px;
+}
+
+.search-box {
+  width: 100%;
+  padding: 8px;
+  background-color: #000;
+  border: 1px solid #004400;
+  color: #00ff00;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+}
+
+.search-box:focus {
+  outline: none;
+  border-color: #00ff00;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+.search-results {
+  background: #000;
+  border: 1px solid #00ff00;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-top: 5px;
+}
+
+.search-result-item {
+  padding: 6px 8px;
+  font-size: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #002200;
+}
+
+.search-result-item:hover {
+  background: #002200;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.flights-list-container {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 300px;
+  background-color: #000;
+  border: 1px solid #004400;
+}
+
+.flights-list {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.flight-item {
+  padding: 8px 10px;
+  border-bottom: 1px solid #002200;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.flight-item:hover {
+  background-color: #002200;
+}
+
+.flight-item.selected {
+  background-color: #004400;
+  color: #ffffff;
+  border-left: 3px solid #00ff00;
+}
+
+.flight-item.subscribed {
+  border-right: 3px solid #ffaa00;
+}
+
+.flight-item:last-child {
+  border-bottom: none;
+}
+
+.flight-callsign {
+  font-weight: bold;
+  font-size: 12px;
+  color: #00ff00;
+}
+
+.flight-info {
+  font-size: 10px;
+  color: #888;
+}
+
+.flight-details {
+  background-color: #000;
+  border: 1px solid #004400;
+  padding: 10px;
+  min-height: 200px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.flight-details.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-style: italic;
+}
+
+.flight-detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  padding: 2px 0;
+}
+
+.flight-detail-label {
+  color: #888;
+  min-width: 80px;
+}
+
+.flight-detail-value {
+  color: #00ff00;
+  text-align: right;
+}
+
+.collision-info {
+  background-color: #000;
+  border: 1px solid #ff0000;
+  padding: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #ff0000;
+}
+
+.collision-warning {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid #ff0000;
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
+.collision-warning:last-child {
+  margin-bottom: 0;
+}
+
+.status-display {
+  background-color: #000;
+  border: 1px solid #004400;
+  padding: 10px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.status-display div {
+  margin-bottom: 5px;
+}
+
+.toggle-group,
+.subscription-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.control-button {
+  background: #000;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 6px 12px;
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 80px;
+}
+
+.control-button:hover {
+  background: #002200;
+}
+
+.control-button.active {
+  background: #004400;
+  color: #ffffff;
+}
+
+/* Scrollbar styling */
+.flights-list-container::-webkit-scrollbar,
+.search-results::-webkit-scrollbar {
+  width: 8px;
+}
+
+.flights-list-container::-webkit-scrollbar-track,
+.search-results::-webkit-scrollbar-track {
+  background: #000;
+}
+
+.flights-list-container::-webkit-scrollbar-thumb,
+.search-results::-webkit-scrollbar-thumb {
+  background: #004400;
+  border-radius: 4px;
+}
+
+.flights-list-container::-webkit-scrollbar-thumb:hover,
+.search-results::-webkit-scrollbar-thumb:hover {
+  background: #006600;
+}

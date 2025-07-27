@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Air Traffic Control Radar</title>
+    <link rel="stylesheet" href="css/radar-base.css" />
+    <link rel="stylesheet" href="css/radar-panels.css" />
+    <link rel="stylesheet" href="css/radar-controls.css" />
+    <link rel="stylesheet" href="css/radar-animations.css" />
+  </head>
+  <body>
+    <!-- Left Panel - 30% larger -->
+    <div class="left-panel">
+      <!-- Flight Search Section -->
+      <div class="panel-section">
+        <div class="panel-title">Flight Search</div>
+        <input
+          type="text"
+          id="flightSearch"
+          class="search-box"
+          placeholder="Search flights by callsign, origin, or destination..."
+        />
+      </div>
+
+      <!-- All Detected Flights Section -->
+      <div class="panel-section">
+        <div class="panel-title">All Detected Flights</div>
+        <div class="flights-list-container">
+          <div id="completeFlightsList" class="flights-list"></div>
+        </div>
+      </div>
+
+      <!-- Flight Details Section -->
+      <div class="panel-section">
+        <div class="panel-title">Flight Details</div>
+        <div id="flightDetails" class="flight-details empty">Select a flight to view details</div>
+      </div>
+    </div>
+
+    <!-- Main Radar Display -->
+    <div class="radar-container">
+      <!-- Connection Status - Top Left -->
+      <div class="connection-status">
+        <div class="status-indicator status-disconnected"></div>
+        <span id="connectionStatus">Disconnected</span>
+      </div>
+
+      <!-- Radar Canvas -->
+      <canvas id="radarCanvas" width="900" height="900"></canvas>
+
+      <!-- Collision Alert -->
+      <div id="collisionAlert" class="collision-alert" style="display: none">
+        <strong>COLLISION RISK!</strong><br />
+        Aircraft approaching minimum separation
+      </div>
+    </div>
+
+    <!-- Right Panel - 30% larger -->
+    <div class="right-panel">
+      <!-- Radar Controls Section -->
+      <div class="panel-section">
+        <div class="panel-title">Radar Controls</div>
+        <div class="toggle-group">
+          <button id="sweepToggle" class="control-button active">Sweep</button>
+          <button id="landmarksToggle" class="control-button active">Landmarks</button>
+          <button id="collisionToggle" class="control-button">Collision</button>
+          <button id="regionMapToggle" class="control-button">Region Map</button>
+        </div>
+      </div>
+
+      <!-- Active Flights Section -->
+      <div class="panel-section">
+        <div class="panel-title">Active Flights (Radar Screen)</div>
+        <div class="flights-list-container">
+          <div id="flightsList" class="flights-list"></div>
+        </div>
+        <div class="subscription-group">
+          <button id="subscribeAllBtn" class="control-button">Subscribe All</button>
+          <button id="unsubscribeAllBtn" class="control-button">Unsubscribe All</button>
+        </div>
+      </div>
+
+      <!-- System Status Section -->
+      <div class="panel-section">
+        <div class="panel-title">System Status</div>
+        <div class="status-display">
+          <div id="connectionDetails">WebSocket: Disconnected</div>
+          <div id="aircraftCount">Active: 0 | Total: 0</div>
+        </div>
+      </div>
+
+      <!-- Collision Information Section -->
+      <div id="collisionSection" class="panel-section" style="display: none">
+        <div class="panel-title">Collision Information</div>
+        <div id="collisionInfo" class="collision-info">No collision risks detected</div>
+      </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.1.0/bundles/stomp.umd.min.js"></script>
+    <!-- <script src="js/protobuf.js"></script> -->
+    <script src="js/radar-constants.js"></script>
+    <script src="js/radar-utils.js"></script>
+    <script src="js/radar-state.js"></script>
+    <script src="js/radar-websocket.js"></script>
+    <script src="js/radar-drawing.js"></script>
+    <script src="js/radar-collision.js"></script>
+    <script src="js/radar-controls.js"></script>
+    <script src="js/radar-events.js"></script>
+    <script src="js/radar-ui.js"></script>
+    <script src="js/radar-main.js"></script>
+  </body>
+</html>

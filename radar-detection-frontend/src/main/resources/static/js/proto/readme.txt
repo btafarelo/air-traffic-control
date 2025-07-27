@@ -1,0 +1,1 @@
+All the .proto files are added here dynamically in compile time by Maven.
