@@ -4,20 +4,30 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.github.btafarelo.airtrafficcontrol</groupId>
-        <artifactId>air-traffic-control</artifactId>
+        <groupId>com.github.btafarelo.airtraffic</groupId>
+        <artifactId>air-traffic</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <!-- bounded-context -->
     <artifactId>radar-detection</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.github.btafarelo.airtraffic.radardetection.RadarDetectionApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
-            <groupId>com.github.btafarelo.airtrafficcontrol</groupId>
-            <artifactId>flight-simulation</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <groupId>com.github.btafarelo.airtraffic</groupId>
+            <artifactId>flight-simulation-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -26,6 +36,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

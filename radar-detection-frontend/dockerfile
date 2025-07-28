@@ -1,0 +1,3 @@
+FROM httpd
+
+COPY /src/main/resources/static /usr/local/apache2/htdocs

@@ -1,0 +1,31 @@
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - 5672:5672
+
+  flight-simulation:
+    build:
+      context: ./flight-simulation
+    image: air-traffic/flight-simulation
+    depends_on:
+      - rabbitmq
+
+  radar-detection:
+    build:
+      context: ./radar-detection
+    image: air-traffic/radar-detection
+    depends_on:
+      - rabbitmq
+      - flight-simulation
+    ports:
+      - 8081:8081
+
+  radar-detection-frontend:
+    build:
+      context: ./radar-detection-frontend
+    image: air-traffic/radar-detection-frontend
+    depends_on:
+      - radar-detection
+    ports:
+      - 80:80

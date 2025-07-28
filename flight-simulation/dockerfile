@@ -1,0 +1,9 @@
+FROM eclipse-temurin:21
+
+WORKDIR /opt/app
+
+EXPOSE 8080
+
+COPY /target/*exec*.jar .
+
+CMD ["sh", "-c", "java -jar /opt/app/flight-simulation-*.jar --spring.profiles.active=docker"]

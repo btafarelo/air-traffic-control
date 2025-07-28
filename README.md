@@ -8,7 +8,7 @@ Welcome to **Air Traffic Control**! This is a Java backend application built usi
 
 The frontend is developed using **jQuery** and **JavaScript**, with real-time communication facilitated by **WebSocket** through **Socket.IO**, providing a dynamic and responsive user interface that interacts seamlessly with the backend.
 
-![frontend](frontend.png) <!-- Replace with the path to your image -->
+![screenshot](screenshot.png) <!-- Replace with the path to your image -->
 
 ## Features
 
@@ -34,8 +34,13 @@ To get a local copy up and running, follow these steps:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/btafarelo/air-traffic-control.git
+   git clone https://github.com/btafarelo/air-traffic.git
 
-2. **RabbitMQ**:
+2. **Docker Compose**:
    ```Docker
-   You can run rabbitmq like this: docker run --rm -ti -p 5672:5672 -p 15672:15672 rabbitmq:management
+   cd project-root
+   docker-compose up
+
+3. **Browser**
+   ```Browser
+   http://localhost

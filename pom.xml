@@ -11,17 +11,16 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <!-- domain -->
-    <groupId>com.github.btafarelo.airtrafficcontrol</groupId>
-    <artifactId>air-traffic-control</artifactId>
+    <groupId>com.github.btafarelo.airtraffic</groupId>
+    <artifactId>air-traffic</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <!-- subdomains -->
     <modules>
         <module>flight-simulation</module>
         <module>radar-detection</module>
         <module>radar-detection-frontend</module>
+        <module>flight-simulation-core</module>
     </modules>
 
     <properties>
@@ -32,6 +31,42 @@
         <spring.cloud.version>4.3.0</spring.cloud.version>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <activation>
+                <property>
+                    <name>spring.profiles.active</name>
+                    <value>docker</value>
+                </property>
+            </activation>
+        </profile>
+    </profiles>
+
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                            <configuration>
+                                <attach>false</attach>
+                                <classifier>exec</classifier>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -40,16 +75,6 @@
                 <version>2025.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-amqp</artifactId>
-                <version>${spring.boot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
-                <version>${spring.cloud.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
