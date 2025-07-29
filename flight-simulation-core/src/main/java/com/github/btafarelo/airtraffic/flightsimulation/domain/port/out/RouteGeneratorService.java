@@ -1,27 +1,30 @@
-package com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.util;
+package com.github.btafarelo.airtraffic.flightsimulation.domain.port.out;
 
 import com.github.btafarelo.airtraffic.flightsimulation.domain.model.Airport;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.model.FlightPosition;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.model.FlightRoute;
+import com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.util.GeoUtils;
 
 import java.util.Random;
 
 import static com.github.btafarelo.airtraffic.flightsimulation.domain.Config.*;
 
-public class RouteGenerator {
+class RouteGeneratorService {
 
     private final Random random;
 
-    final double ANGLE_RANGE_72 = 0.4 * Math.PI; // 72 degrees
-
+    private final double ANGLE_RANGE_72 = 0.4 * Math.PI; // 72 degrees
     private static final double FULL_CIRCLE_RADIANS = 2 * Math.PI;
     private static final double FULL_AND_HALF_CIRCLE_RADIANS = 3 * Math.PI;
 
-    public RouteGenerator() {
+    private static final FlightPosition OUT_OF_RANGE = new FlightPosition(
+            0.0,0.0,0.0,false,0.0,0.0);
+
+    RouteGeneratorService() {
         this.random = new Random();
     }
 
-    public FlightRoute generateRoute(Airport origin, Airport destination) {
+    FlightRoute generateRoute(Airport origin, Airport destination) {
         double[] startPoint;
         double[] endPoint;
 
@@ -63,7 +66,7 @@ public class RouteGenerator {
         return flightRoute;
     }
 
-    public void generateFullRoute(FlightRoute route) {
+    void generateFullRoute(FlightRoute route) {
 
         int totalUpdates = FLIGHT_DURATION_SECONDS * 1000 / FLIGHT_UPDATE_INTERVAL_MS;
 
@@ -94,5 +97,7 @@ public class RouteGenerator {
             route.addStep(new FlightPosition(latitude, longitude, distanceFromRadar, inRadarRange, currentAltitude,
                     currentSpeed));
         }
+
+        route.addStep(OUT_OF_RANGE);
     }
 }

@@ -6,6 +6,8 @@ import com.github.btafarelo.airtraffic.flightsimulation.domain.model.FlightRoute
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 import static com.github.btafarelo.airtraffic.flightsimulation.domain.Config.FLIGHT_UPDATE_INTERVAL_MS;
 
 public class FlightSimulator implements Runnable {
@@ -35,13 +37,10 @@ public class FlightSimulator implements Runnable {
         LOGGER.info("Started new thread -> {}", flight.getCallsign());
 
         long startTime = System.currentTimeMillis();
-        int steps = route.steps.size();
+        List<FlightPosition> steps = route.getSteps();
 
-        for (int step = 0; step <= route.steps.size(); step++) {
-            if (step == route.steps.size())
-                flight.setPosition(new FlightPosition(0.0,0.0,0.0,false,0.0,0.0));
-            else
-                flight.setPosition(route.steps.get(step));
+        for (int step = 0; step < steps.size(); step++) {
+            flight.setPosition(route.steps.get(step));
 
             flightObserver.onFlightUpdated(flight); // Notify observer of the update
 

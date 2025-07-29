@@ -2,9 +2,7 @@ package com.github.btafarelo.airtraffic.flightsimulation.domain.model;
 
 import com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.util.GeoUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class FlightRoute {
 
@@ -26,7 +24,7 @@ public class FlightRoute {
         this.origin = origin;
         this.destination = destination;
         this.totalDistance = GeoUtils.calculateDistance(startLat, startLon, endLat, endLon);
-        this.steps = Collections.synchronizedList(new ArrayList<>());
+        this.steps = new LinkedList<>();
     }
 
     // Getters
@@ -42,7 +40,7 @@ public class FlightRoute {
         this.steps.add(step);
     }
 
-    public FlightPosition getNextStep() {
-        return this.steps.remove(0);
+    public List<FlightPosition> getSteps() {
+        return this.steps;
     }
 }

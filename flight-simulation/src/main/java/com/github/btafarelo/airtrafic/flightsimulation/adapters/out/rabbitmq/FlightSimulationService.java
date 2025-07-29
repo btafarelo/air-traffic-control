@@ -37,7 +37,7 @@ public class FlightSimulationService extends AFlightSimulationService {
     @PostConstruct
     public void startSimulation() throws InterruptedException {
         while (simulationThreads.size() < 15) {
-            FlightSimulator flightSimulator = generateFlight(new Random().nextInt(), this);
+            FlightSimulator flightSimulator = generateFlight(random.nextInt(), this);
             Thread simulationThread = new Thread(flightSimulator);
             simulationThread.start();
             simulationThreads.add(simulationThread);
