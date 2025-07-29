@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Queue;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +23,20 @@ public class FlightSimulationService extends AFlightSimulationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlightSimulationService.class);
 
-    @Autowired
-    private AmqpTemplate amqpTemplate;
+    private final AmqpTemplate amqpTemplate;
 
-    @Autowired
-    private Queue queue;
+    private final Queue queue;
 
-    private final List<Thread> simulationThreads = new ArrayList<>();
+    private final List<Thread> simulationThreads;
 
-    private Random random = new Random();
+    private final Random random;
+
+    public FlightSimulationService(AmqpTemplate amqpTemplate, Queue queue) {
+        this.amqpTemplate = amqpTemplate;
+        this.queue = queue;
+        this.simulationThreads = new ArrayList<>();
+        this.random = new Random();
+    }
 
     @PostConstruct
     public void startSimulation() throws InterruptedException {
