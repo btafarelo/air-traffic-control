@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiConsumer;
 
+/**
+ * Set of config properties used by the App and following the principle of
+ * keeping the core module framework free.
+ */
 public class Config {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
@@ -42,6 +46,9 @@ public class Config {
         loadProperties();
     }
 
+    /**
+     * Load the property file set in FILENAME and set all the values dynamically
+     */
     private static void loadProperties() {
         Properties properties = new Properties();
 
@@ -62,6 +69,10 @@ public class Config {
         }
     }
 
+    /**
+     *  This method hide the complexity to call the field setter
+     *
+     */
     private static void setStaticField(String key, String value) throws NoSuchFieldException {
         try {
             Field field = Config.class.getDeclaredField(key);
@@ -76,6 +87,10 @@ public class Config {
         }
     }
 
+    /**
+     *  Referenced by typeMap and invoked in setStaticField, this actually sets field value
+     *
+     */
     private static <T> void setFieldValue(Field field, T value) {
         try {
             field.setAccessible(true); // Allow access to private fields
