@@ -1,5 +1,6 @@
 package com.github.btafarelo.airtrafic.flightsimulation.adapters.out.rabbitmq;
 
+import com.github.btafarelo.airtraffic.flightsimulation.domain.Config;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.model.Flight;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.AFlightSimulationService;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.FlightSimulator;
@@ -40,7 +41,7 @@ public class FlightSimulationService extends AFlightSimulationService {
 
     @PostConstruct
     public void startSimulation() throws InterruptedException {
-        while (simulationThreads.size() < 15) {
+        while (simulationThreads.size() < Config.MAX_NUMBER_OF_FLIGHTS) {
             FlightSimulator flightSimulator = generateFlight(random.nextInt(), this);
             Thread simulationThread = new Thread(flightSimulator);
             simulationThread.start();
