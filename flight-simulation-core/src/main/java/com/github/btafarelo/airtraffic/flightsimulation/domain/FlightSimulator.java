@@ -1,8 +1,9 @@
-package com.github.btafarelo.airtraffic.flightsimulation.domain.port.out;
+package com.github.btafarelo.airtraffic.flightsimulation.domain;
 
 import com.github.btafarelo.airtraffic.flightsimulation.domain.model.Flight;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.model.FlightPosition;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.model.FlightRoute;
+import com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.IFlightObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

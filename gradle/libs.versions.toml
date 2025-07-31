@@ -1,0 +1,9 @@
+[versions]
+spring-boot-starter = "3.5.4"
+spring-cloud-starter-stream-rabbit = "4.3.0"
+slf4j = "2.0.17"
+
+[libraries]
+rabbitmq = { module = "org.springframework.cloud:spring-cloud-starter-stream-rabbit", version.ref = "spring-cloud-starter-stream-rabbit" }
+websocket = { module = "org.springframework.boot:spring-boot-starter-websocket", version.ref = "spring-boot-starter" }
+slf4j = { module = "org.slf4j:slf4j-log4j12", version.ref= "slf4j" }

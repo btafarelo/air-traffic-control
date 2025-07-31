@@ -1,4 +1,4 @@
-package com.github.btafarelo.airtrafic.flightsimulation.adapters.out.rabbitmq;
+package com.github.btafarelo.airtraffic.flightsimulation.adapters.out.rabbitmq;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;

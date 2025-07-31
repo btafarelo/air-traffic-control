@@ -1,0 +1,3 @@
+rootProject.name = 'air-traffic'
+include 'flight-simulation-core', 'flight-simulation', 'radar-detection'
+//, 'radar-detection-frontend',

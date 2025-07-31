@@ -1,0 +1,13 @@
+plugins {
+    id 'org.springframework.boot' version '3.5.4'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+dependencies {
+    implementation project(':flight-simulation-core')
+    implementation rootProject.libs.rabbitmq
+}
+
+bootJar {
+    mainClass = 'com.github.btafarelo.airtraffic.flightsimulation.FlightSimulationApplication'
+}

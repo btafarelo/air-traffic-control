@@ -1,0 +1,33 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+}
+
+group = 'com.github.btafarelo.airtraffic'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.0'
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    group = 'com.github.btafarelo.airtraffic'
+    version = '1.0.0-SNAPSHOT'
+    sourceCompatibility = 21
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+
+    }
+}

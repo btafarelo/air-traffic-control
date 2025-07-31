@@ -1,4 +1,4 @@
-package com.github.btafarelo.airtrafic.flightsimulation;
+package com.github.btafarelo.airtraffic.flightsimulation;
 
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;

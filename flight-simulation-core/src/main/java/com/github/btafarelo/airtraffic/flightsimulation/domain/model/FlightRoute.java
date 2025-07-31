@@ -1,7 +1,5 @@
 package com.github.btafarelo.airtraffic.flightsimulation.domain.model;
 
-import com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.util.GeoUtils;
-
 import java.util.*;
 
 public class FlightRoute {
@@ -15,7 +13,7 @@ public class FlightRoute {
     private final Airport destination;
     public List<FlightPosition> steps;
 
-    public FlightRoute(double startLat, double startLon, double endLat, double endLon,
+    public FlightRoute(double startLat, double startLon, double endLat, double endLon, double distance,
                        Airport origin, Airport destination) {
         this.startLat = startLat;
         this.startLon = startLon;
@@ -23,7 +21,7 @@ public class FlightRoute {
         this.endLon = endLon;
         this.origin = origin;
         this.destination = destination;
-        this.totalDistance = GeoUtils.calculateDistance(startLat, startLon, endLat, endLon);
+        this.totalDistance = distance;
         this.steps = new LinkedList<>();
     }
 

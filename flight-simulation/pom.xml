@@ -17,7 +17,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.github.btafarelo.airtrafic.flightsimulation.FlightSimulationApplication</mainClass>
+                    <mainClass>com.github.btafarelo.airtraffic.flightsimulation.FlightSimulationApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
