@@ -1,6 +1,6 @@
 package com.github.btafarelo.airtraffic.radardetection.adapters.in.rabbitmq;
 
-import com.github.btafarelo.airtraffic.radardetection.adapters.out.websocket.WebSocketMessagingService;
+import com.github.btafarelo.airtraffic.radardetection.adapters.out.websocket.BroadcastFlightDetectedService;
 import com.github.btafarelo.airtraffic.radardetection.domain.port.in.IFlightDetectedService;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.events.FlightDetectedEvent;
 import org.slf4j.Logger;
@@ -13,10 +13,10 @@ public class FlightDetectedListener implements IFlightDetectedService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlightDetectedListener.class);
 
-    private final WebSocketMessagingService webSocketMessagingService;
+    private final BroadcastFlightDetectedService broadcastFlightDetectedService;
 
-    public FlightDetectedListener(WebSocketMessagingService webSocketMessagingService) {
-        this.webSocketMessagingService = webSocketMessagingService;
+    public FlightDetectedListener(BroadcastFlightDetectedService broadcastFlightDetectedService) {
+        this.broadcastFlightDetectedService = broadcastFlightDetectedService;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class FlightDetectedListener implements IFlightDetectedService {
     public void onFlightDetected(FlightDetectedEvent event) {
         LOGGER.info("FlightDetectedEvent -> {}", event.getFlight().getCallsign());
 
-        webSocketMessagingService.sendFlightDetectedEvent(event);
+        broadcastFlightDetectedService.sendFlightDetectedEvent(event);
     }
 }
