@@ -1,4 +1,8 @@
 spring:
+  application:
+    name: flight-simulation
+  kafka:
+    bootstrap-servers: kafka:9092
   rabbitmq:
     host: rabbitmq
     port: 5672

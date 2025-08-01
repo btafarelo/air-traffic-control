@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation project(':flight-simulation-core')
     implementation rootProject.libs.rabbitmq
+    implementation rootProject.libs.springkafka
 }
 
 bootJar {

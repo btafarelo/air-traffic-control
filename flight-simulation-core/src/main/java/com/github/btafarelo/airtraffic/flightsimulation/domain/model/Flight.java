@@ -3,7 +3,7 @@ package com.github.btafarelo.airtraffic.flightsimulation.domain.model;
 public class Flight {
 
     //Entity ID
-    private final String callsign;
+    private String callsign;
 
     private double latitude;
     private double longitude;
@@ -16,6 +16,8 @@ public class Flight {
     private double distanceFromRadar;
     private boolean inRadarRange;
     private long generationTimestamp;
+
+    public Flight() { }
 
     public Flight(String callsign) {
         this.callsign = callsign;

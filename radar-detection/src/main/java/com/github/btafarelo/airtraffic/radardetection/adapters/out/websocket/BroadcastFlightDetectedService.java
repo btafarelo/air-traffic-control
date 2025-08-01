@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BroadcastFlightDetectedService implements BroadcastFlightDetected {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BroadcastFlightDetectedService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BroadcastFlightDetectedService.class);
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -20,7 +20,7 @@ public class BroadcastFlightDetectedService implements BroadcastFlightDetected {
 
     @Override
     public void sendFlightDetectedEvent(FlightDetectedEvent event) {
-        LOGGER.info("FlightDetectedEvent -> {}", event);
+        LOG.info("FlightDetectedEvent -> {}", event);
         messagingTemplate.convertAndSend("/topic/flightUpdates", event);
     }
 }

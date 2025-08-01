@@ -7,6 +7,8 @@ dependencies {
     implementation project(':flight-simulation-core')
     implementation rootProject.libs.websocket
     implementation rootProject.libs.rabbitmq
+    implementation rootProject.libs.springkafka
+    implementation rootProject.libs.kafkastreams
 }
 
 bootJar {

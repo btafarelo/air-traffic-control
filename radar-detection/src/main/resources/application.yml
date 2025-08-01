@@ -2,6 +2,10 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: radar-detection
+  kafka:
+    bootstrap-servers: localhost:9092
   rabbitmq:
     host: localhost
     port: 5672

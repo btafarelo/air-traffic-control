@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
  */
 public class Config {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Config.class);
 
     private static final String FILENAME = "app.properties";
 

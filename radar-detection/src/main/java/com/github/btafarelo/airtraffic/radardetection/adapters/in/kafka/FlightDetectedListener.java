@@ -1,16 +1,16 @@
-package com.github.btafarelo.airtraffic.radardetection.adapters.in.rabbitmq;
+package com.github.btafarelo.airtraffic.radardetection.adapters.in.kafka;
 
+import com.github.btafarelo.airtraffic.flightsimulation.domain.events.FlightDetectedEvent;
 import com.github.btafarelo.airtraffic.radardetection.adapters.out.websocket.BroadcastFlightDetectedService;
 import com.github.btafarelo.airtraffic.radardetection.domain.port.in.IFlightDetectedService;
-import com.github.btafarelo.airtraffic.flightsimulation.domain.events.FlightDetectedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Profile;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("rabbitmq")
+@Profile("kafka")
 public class FlightDetectedListener implements IFlightDetectedService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlightDetectedListener.class);
@@ -22,7 +22,7 @@ public class FlightDetectedListener implements IFlightDetectedService {
     }
 
     @Override
-    @RabbitListener(queues = "flightDetectedStream")
+    @KafkaListener(topics = "flightDetectedStream", groupId = "radarDetectionApplication")
     public void onFlightDetected(FlightDetectedEvent event) {
         LOG.info("FlightDetectedEvent -> {}", event.getFlight().getCallsign());
 

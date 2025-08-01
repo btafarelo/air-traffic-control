@@ -1,6 +1,7 @@
 package com.github.btafarelo.airtraffic.flightsimulation.domain;
 
 import com.github.btafarelo.airtraffic.flightsimulation.domain.model.*;
+import com.github.btafarelo.airtraffic.flightsimulation.domain.port.in.IFlightSimulationService;
 import com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.IFlightObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +11,9 @@ import java.util.*;
 import static com.github.btafarelo.airtraffic.flightsimulation.domain.Config.FLIGHT_STAGGER_MAX_SECONDS;
 import static com.github.btafarelo.airtraffic.flightsimulation.domain.Config.FLIGHT_STAGGER_MIN_SECONDS;
 
-public class FlightSimulationService {
+public class FlightSimulationService implements IFlightSimulationService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlightSimulationService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FlightSimulationService.class);
 
     private final Random random;
 
@@ -29,17 +30,13 @@ public class FlightSimulationService {
         this.observer = observer;
     }
 
-    public void startSimulation() throws InterruptedException {
+    @Override
+    public void start() throws InterruptedException {
         while (simulationThreads.size() < Config.MAX_NUMBER_OF_FLIGHTS) {
             FlightSimulator flightSimulator = generateFlight(random.nextInt());
             Thread simulationThread = new Thread(flightSimulator);
             simulationThread.start();
             simulationThreads.add(simulationThread);
-
-            // Stagger flight starts
-            int staggerTime = FLIGHT_STAGGER_MIN_SECONDS * 1000 +
-                    random.nextInt((FLIGHT_STAGGER_MAX_SECONDS - FLIGHT_STAGGER_MIN_SECONDS) * 1000);
-            Thread.sleep(staggerTime);
         }
     }
 
@@ -47,9 +44,9 @@ public class FlightSimulationService {
         for (int i = 0; i < simulationThreads.size(); i++) {
             Thread thread = simulationThreads.get(i);
             if (!thread.isAlive()) {
-                LOGGER.info("Thread {} has died. Restarting...", thread.getName());
+                LOG.info("Thread {} has died. Restarting...", thread.getName());
                 simulationThreads.remove(i);
-                startSimulation(); // Start a new thread
+                start(); // Start a new thread
                 i--; // Adjust index after removal
             }
         }
@@ -74,7 +71,11 @@ public class FlightSimulationService {
 
         FlightRoute route = new RouteGeneratorService().generateRoute(origin, destination);
 
-        return new FlightSimulator(flight, route, observer);
+        // Stagger flight starts
+        int staggerTime = FLIGHT_STAGGER_MIN_SECONDS * 1000 +
+                random.nextInt((FLIGHT_STAGGER_MAX_SECONDS - FLIGHT_STAGGER_MIN_SECONDS) * 1000);
+
+        return new FlightSimulator(flight, route, observer, staggerTime);
     }
 
     private AircraftType getRandomAircraftType() {

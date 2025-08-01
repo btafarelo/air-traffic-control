@@ -1,25 +1,23 @@
 package com.github.btafarelo.airtraffic.flightsimulation.adapters.in.spring;
 
-import com.github.btafarelo.airtraffic.flightsimulation.domain.FlightSimulationService;
-import com.github.btafarelo.airtraffic.flightsimulation.domain.port.in.ISimulation;
+import com.github.btafarelo.airtraffic.flightsimulation.domain.port.in.IFlightSimulationService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Simulation extends ISimulation {
+public class FlightSimulationService implements IFlightSimulationService {
 
-    private final FlightSimulationService service;
+    private final IFlightSimulationService service;
 
-    public Simulation(final FlightSimulationService service) {
-        super(service);
+    public FlightSimulationService(final IFlightSimulationService service) {
         this.service = service;
     }
 
     @Override
     @PostConstruct
     public void start() throws InterruptedException {
-        service.startSimulation();
+        service.start();
     }
 
     @Override

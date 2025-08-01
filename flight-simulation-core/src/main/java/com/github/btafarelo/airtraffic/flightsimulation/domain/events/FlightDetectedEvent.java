@@ -6,6 +6,10 @@ public class FlightDetectedEvent {
 
     private Flight flight;
 
+    public FlightDetectedEvent() {
+
+    }
+
     public FlightDetectedEvent(Flight flight) {
         this.flight = flight;
     }

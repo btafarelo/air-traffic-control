@@ -5,9 +5,11 @@ import com.github.btafarelo.airtraffic.flightsimulation.domain.events.FlightDete
 import com.github.btafarelo.airtraffic.flightsimulation.domain.port.out.IFlightObserver;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Queue;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("rabbitmq")
 public class RabbitMQGateway implements IFlightObserver {
 
     private final AmqpTemplate amqpTemplate;
