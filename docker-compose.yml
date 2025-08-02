@@ -1,25 +1,43 @@
 services:
   rabbitmq:
-    image: rabbitmq:management
-    ports:
-      - 5672:5672
+    image: rabbitmq
+    profiles:
+      - rabbitmq
+
+  kafka:
+    image: apache/kafka:4.0.0
+    profiles:
+      - default
+      - kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 1
 
   flight-simulation:
     build:
       context: ./flight-simulation
     image: air-traffic/flight-simulation
-    depends_on:
-      - rabbitmq
+    environment:
+      SPRING_PROFILES_ACTIVE: "docker,${COMPOSE_PROFILES}"
 
   radar-detection:
     build:
       context: ./radar-detection
     image: air-traffic/radar-detection
     depends_on:
-      - rabbitmq
       - flight-simulation
-    ports:
-      - 8081:8081
+    environment:
+      SPRING_PROFILES_ACTIVE: "docker,${COMPOSE_PROFILES}"
 
   radar-detection-frontend:
     build:
@@ -29,3 +47,5 @@ services:
       - radar-detection
     ports:
       - 80:80
+    volumes:
+      - ./docker/httpd.conf:/usr/local/apache2/conf/httpd.conf

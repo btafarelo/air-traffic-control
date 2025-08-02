@@ -13,8 +13,8 @@ The frontend is developed using **jQuery** and **JavaScript**, with real-time co
 ## Features
 
 - **Hexagonal Architecture**: Promotes separation of concerns, making the codebase easier to manage and test.
-- **Asynchronous Messaging**: Utilizes RabbitMQ for reliable message queuing and processing.
-- **Real-Time Communication**: Implements WebSocket with Socket.IO for instant data exchange between the client and server.
+- **Event-Driven**: Utilizes RabbitMQ/Kafka for reliable streaming processing.
+- **Real-Time Communication**: Implements WebSocket with StompJS for instant data exchange between the client and server.
 - **Dynamic Frontend**: Built with jQuery and JavaScript for a smooth user experience.
 
 ## Technology Stack
@@ -23,7 +23,9 @@ The frontend is developed using **jQuery** and **JavaScript**, with real-time co
     - Java
     - Spring Framework
     - RabbitMQ
-    - WebSocket (Socket.IO)
+    - Kafka
+    - WebSocket StompJS
+    - Gradle and Maven
 - **Frontend**:
     - jQuery
     - JavaScript
@@ -36,11 +38,17 @@ To get a local copy up and running, follow these steps:
    ```bash
    git clone https://github.com/btafarelo/air-traffic.git
 
-2. **Docker Compose**:
+2. **Building**
+   - Despite gradle support, docker-compose is only compatible with maven target folder for now.
+   ```Building for Docker
+    mvn clean package -Pdocker
+   
+3. **Docker Compose**:
+    - Choose between one out of two message brokers kafka or rabbitmq.
    ```Docker
    cd project-root
-   docker-compose up
+   COMPOSE_PROFILES=kafka docker-compose up
 
-3. **Browser**
+4. **Browser**
    ```Browser
    http://localhost

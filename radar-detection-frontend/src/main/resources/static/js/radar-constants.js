@@ -26,7 +26,7 @@ window.RADAR_CONFIG = {
 
 // WebSocket configuration
 window.WS_CONFIG = {
-  URL: "ws://localhost:8081/flight-feed",
+  URL: "ws://localhost/flight-feed",
   RECONNECT_INTERVAL: 5000,
   MAX_RECONNECT_ATTEMPTS: 10,
   HEARTBEAT_INTERVAL: 30000,

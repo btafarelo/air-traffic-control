@@ -8,7 +8,7 @@ window.RadarWebSocket = {
   stompSocket: new StompJs.Client({
       client: null,
       observers: new Map(),
-      brokerURL: 'ws://localhost:8081/flight-feed',
+      brokerURL: 'ws://localhost/flight-feed',
       connectHeaders: {
          login: 'user',
          passcode: 'password',

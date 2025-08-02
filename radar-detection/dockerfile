@@ -6,4 +6,4 @@ EXPOSE 8081
 
 COPY /target/*exec*.jar .
 
-CMD ["sh", "-c", "java -jar /opt/app/radar-detection-*.jar --spring.profiles.active=docker"]
+CMD ["sh", "-c", "java -jar /opt/app/radar-detection-*.jar"]
